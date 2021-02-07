@@ -1,0 +1,28 @@
+{
+  "name": "telebomb",
+  "version": "0.0.1",
+  "description": "",
+  "main": "bootstrap.js",
+  "scripts": {
+    "start": "node bootstrap.js",
+    "lint": "standard --fix",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "telegram"
+  ],
+  "author": "BB. Jansen <bobjansen@pm.me>",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "console-stamp": "^0.2.9",
+    "dotenv": "^8.2.0",
+    "knex": "^0.21.17",
+    "moment": "^2.29.1",
+    "node-cron": "^2.0.3",
+    "sqlite3": "^5.0.1",
+    "threads": "^1.6.3"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
+  }
+}

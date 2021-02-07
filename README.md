@@ -1,0 +1,9 @@
+# telebomb
+>
+
+
+## .env
+
+```bash
+
+```
