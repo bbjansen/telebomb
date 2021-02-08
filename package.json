@@ -14,14 +14,12 @@
   "author": "BB. Jansen <bobjansen@pm.me>",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "console-stamp": "^0.2.9",
+    "@mtproto/core": "5.3.0",
     "dotenv": "^8.2.0",
-    "gram-js-fork": "^1.0.0-alpha.14",
     "knex": "^0.21.17",
     "moment": "^2.29.1",
     "node-cron": "^2.0.3",
-    "sqlite3": "^5.0.1",
-    "threads": "^1.6.3"
+    "sqlite3": "^5.0.1"
   },
   "devDependencies": {
     "standard": "^16.0.3"

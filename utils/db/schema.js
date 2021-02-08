@@ -7,21 +7,6 @@
 const db = require('../../libs').knex
 
 // Create 'scraps' table if it does not exist
-db.schema.hasTable('scraps').then(function (exists) {
-  if (!exists) {
-    console.info('[DB] Table `scraps` created')
-
-    return db.schema.createTable('scraps', function (table) {
-      table.integer('id').unique().notNullable()
-      table.string('username').nullable()
-      table.integer('channel').nullable()
-      table.integer('count').nullable()
-      table.bigInteger('timestamp').nullable()
-    })
-  };
-})
-
-// Create 'users' table if it does not exist
 db.schema.hasTable('users').then(function (exists) {
   if (!exists) {
     console.info('[DB] Table `users` created')
@@ -29,12 +14,25 @@ db.schema.hasTable('users').then(function (exists) {
     return db.schema.createTable('users', function (table) {
       table.integer('id').unique().notNullable()
       table.string('username').nullable()
-      table.string('first_name').nullable()
-      table.string('last_name').nullable()
-      table.bigInteger('phone').nullable()
-      table.integer('api_id').nullable()
-      table.string('api_hash').nullable()
-      table.bigInteger('timestamp').nullable()
+      table.integer('channel').nullable()
+      table.integer('count').nullable()
+      table.bigInteger('logged').nullable()
+    })
+  };
+})
+
+// Create 'seeds' table if it does not exist
+db.schema.hasTable('seeds').then(function (exists) {
+  if (!exists) {
+    console.info('[DB] Table `seeds` created')
+
+    return db.schema.createTable('seeds', function (table) {
+      table.integer('id').unique().notNullable()
+      table.string('phone').nullable()
+      table.integer('api').nullable()
+      table.string('hash').nullable()
+      table.bigInteger('scanned').nullable()
+      table.boolean('update').nullable()
     })
   };
 })

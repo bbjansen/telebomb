@@ -14,15 +14,7 @@ const { LocalStorage } = require('node-localstorage')
 
 const Scrape = (async () => {
   try {
-    // Lets select a random user in our database
-    const seeds = await seed.all()
-
-    const randomize = Math.floor(Math.random() * seeds.length)
-    const target = seeds[randomize]
-
-    console.log(target.phone + ' selected for harvesting.')
-
-
+    
     // Lets open a connection via the Telegram MTProto protocol.
 
     const mtproto = new MTProto({
@@ -30,18 +22,26 @@ const Scrape = (async () => {
       api_hash: target.hash,
       customLocalStorage: LocalStorage('./sessions')
     })
-
-
-
-    const dialogs = await mtproto.call('messages.getDialogs', {
-      offset_peer: {
-        _: 'inputPeerEmpty'
+    
+    const code = await mtproto.call('auth.sendCode', {
+      phone_number: target.phone,
+      settings: {
+        _: 'codeSettings',
       },
-      limit: 100
     },
     { dcId: 4 });
 
-    //.log(dialogs)
+    console.log(code.phone_code_hash)
+
+
+    const signin = await mtproto.call('auth.signIn', {
+      phone_code: 46345,
+      phone_number: target.phone,
+      phone_code_hash: code.phone_code_hash
+    },
+    { dcId: 4, syncAuth: true });
+
+
   } catch (err) {
     console.error(err)
   }

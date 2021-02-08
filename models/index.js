@@ -4,4 +4,4 @@
 
 'use strict'
 
-module.exports.knex = require('./knex')
+module.exports.Seeds = require('./Seeds')
