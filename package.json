@@ -16,6 +16,7 @@
   "dependencies": {
     "console-stamp": "^0.2.9",
     "dotenv": "^8.2.0",
+    "gram-js-fork": "^1.0.0-alpha.14",
     "knex": "^0.21.17",
     "moment": "^2.29.1",
     "node-cron": "^2.0.3",

@@ -12,6 +12,7 @@ db.schema.hasTable('scraps').then(function (exists) {
     console.info('[DB] Table `scraps` created')
 
     return db.schema.createTable('scraps', function (table) {
+      table.integer('id').unique().notNullable()
       table.string('username').nullable()
       table.integer('channel').nullable()
       table.integer('count').nullable()
@@ -26,10 +27,11 @@ db.schema.hasTable('users').then(function (exists) {
     console.info('[DB] Table `users` created')
 
     return db.schema.createTable('users', function (table) {
+      table.integer('id').unique().notNullable()
       table.string('username').nullable()
       table.string('first_name').nullable()
-      table.string('last_last').nullable()
-      table.string('phone').nullable()
+      table.string('last_name').nullable()
+      table.bigInteger('phone').nullable()
       table.integer('api_id').nullable()
       table.string('api_hash').nullable()
       table.bigInteger('timestamp').nullable()
