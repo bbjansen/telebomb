@@ -34,7 +34,6 @@ const Scrape = (async () => {
     })
 
 
-
     const dialogs = await mtproto.call('messages.getDialogs', {
       offset_peer: {
         _: 'inputPeerEmpty'
