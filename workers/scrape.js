@@ -42,7 +42,9 @@ const Scrape = (async () => {
     },
     { dcId: 4 });
 
-    //.log(dialogs)
+
+
+    console.log(dialogs)
   } catch (err) {
     console.error(err)
   }
