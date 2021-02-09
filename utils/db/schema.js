@@ -6,33 +6,49 @@
 
 const db = require('../../libs').knex
 
-// Create 'scraps' table if it does not exist
+// Create 'accounts' table if it does not exist
+db.schema.hasTable('accounts').then(function (exists) {
+  if (!exists) {
+    console.info('[DB] Table `accounts` created')
+
+    return db.schema.createTable('accounts', function (table) {
+      table.string('phone').unique().nullable()
+      table.integer('dc').nullable()
+      table.integer('api').nullable()
+      table.string('hash').nullable()
+      table.bigInteger('scanned').nullable()
+    })
+  };
+})
+
+// Create 'users' table if it does not exist
 db.schema.hasTable('users').then(function (exists) {
   if (!exists) {
     console.info('[DB] Table `users` created')
 
     return db.schema.createTable('users', function (table) {
-      table.integer('id').unique().notNullable()
+      table.string('id').unique().nullable()
+      table.string('hash').nullable()
+      table.string('phone').nullable()
       table.string('username').nullable()
-      table.integer('channel').nullable()
-      table.integer('count').nullable()
+      table.boolean('invited').nullable()
       table.bigInteger('logged').nullable()
     })
   };
 })
 
-// Create 'seeds' table if it does not exist
-db.schema.hasTable('seeds').then(function (exists) {
+// Create 'channels' table if it does not exist
+db.schema.hasTable('channels').then(function (exists) {
   if (!exists) {
-    console.info('[DB] Table `seeds` created')
+    console.info('[DB] Table `channels` created')
 
-    return db.schema.createTable('seeds', function (table) {
+    return db.schema.createTable('channels', function (table) {
       table.integer('id').unique().notNullable()
-      table.string('phone').nullable()
-      table.integer('api').nullable()
       table.string('hash').nullable()
+      table.string('username').nullable()
+      table.string('title').nullable()
       table.bigInteger('scanned').nullable()
-      table.boolean('update').nullable()
+      table.bigInteger('logged').nullable()
     })
   };
 })

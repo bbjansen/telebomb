@@ -4,4 +4,6 @@
 
 'use strict'
 
-module.exports.Seeds = require('./Seeds')
+module.exports.Accounts = require('./Accounts')
+module.exports.Users = require('./Users')
+module.exports.Channels = require('./Channels')
