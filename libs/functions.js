@@ -9,7 +9,7 @@ const moment = require('moment')
 const Accounts = require('../models').Accounts
 const accounts = new Accounts()
 
-async function pickAccount() {
+async function availableAccounts() {
     // Lets select a random account in our database
     const getAccounts = await accounts.all()
 
@@ -17,7 +17,7 @@ async function pickAccount() {
     const filterAccounts = getAccounts.filter(account => {
       const difference = moment().diff(moment(account.scanned, 'X'), 'hours')
 
-      if (difference >= process.env.ACCOUNT_TIMEOUT) {
+      if (difference >= process.env.SCRAPE_ACCOUNT_INTERVAL) {
         return account
       }
     })
@@ -29,13 +29,7 @@ async function pickAccount() {
       console.log('[ACCOUNT] ' + filterAccounts.length + '/' + getAccounts.length + ' accounts available')
     }
 
-    // Lets now select 1 account from the filtered ones by random
-    const randomize = Math.floor(Math.random() * filterAccounts.length)
-    const target = filterAccounts[randomize]
-
-    console.log('[ACCOUNT] ' + target.phone + ' selected')
-
-    return target
+    return filterAccounts
 }
 
-module.exports = { pickAccount }
+module.exports = { availableAccounts }

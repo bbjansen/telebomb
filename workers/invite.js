@@ -21,8 +21,8 @@ const channels = new Channels()
 const links = new Links()
 
 process.env.DEBUG = 1
-process.env.ACCOUNT_TIMEOUT = 0
-process.env.CHANNEL_TIMEOUT = 0
+process.env.INVITE_ACCOUNT_INTERVAL = 0
+process.env.INVITE_CHANNEL_INTERVAL = 0
 
 const Invite = (async () => {
   try {
@@ -31,7 +31,13 @@ const Invite = (async () => {
     let channelCount = 0
 
     // Lets select a random account in our database
-    const target = await functions.pickAccount()
+    const availableAccounts = await functions.availableAccounts()
+
+    // Lets now select 1 account from the filtered ones by random
+    const randomize = Math.floor(Math.random() * availableAccounts.length)
+    const target = availableAccounts[randomize]
+
+    console.log('[ACCOUNT] ' + target.phone + ' selected')
 
     // Lets open a connection via the Telegram MTProto protocol.
     const telegram = new MTProto({
