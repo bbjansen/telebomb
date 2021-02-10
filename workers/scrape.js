@@ -11,10 +11,12 @@ const moment = require('moment')
 const Accounts = require('../models').Accounts
 const Users = require('../models').Users
 const Channels = require('../models').Channels
+const Links = require('../models').Links
 
 const accounts = new Accounts()
 const users = new Users()
 const channels = new Channels()
+const links = new Links()
 
 process.env.DEBUG = 1
 process.env.ACCOUNT_TIMEOUT = 0
@@ -22,7 +24,6 @@ process.env.CHANNEL_TIMEOUT = 0
 
 const Scrape = (async () => {
   try {
-
     // Setup counts
     let userCount = 0
     let channelCount = 0
@@ -32,21 +33,19 @@ const Scrape = (async () => {
 
     // Lets filter out recently scanned accounts
     const filterAccounts = getAccounts.filter(account => {
-
       const difference = moment().diff(moment(account.scanned, 'X'), 'days')
 
-      if(difference >= process.env.ACCOUNT_TIMEOUT) {
+      if (difference >= process.env.ACCOUNT_TIMEOUT) {
         return account
       }
     })
 
-    if(filterAccounts.length === 0) {
+    if (filterAccounts.length === 0) {
       console.log('[ACCOUNT] no accounts available for scanning right now.')
       return
-    } 
-    else {
+    } else {
       console.log('[ACCOUNT] ' + filterAccounts.length + '/' + getAccounts.length + ' accounts available')
-    }    
+    }
 
     // Lets now select 1 account from the filtered ones by random
     const randomize = Math.floor(Math.random() * filterAccounts.length)
@@ -75,7 +74,6 @@ const Scrape = (async () => {
     // Lets store the users in these messages
     for (const user of messages.users) {
       if (!user.bot && !user.deleted) {
-
         await users.insert({
           id: user.id,
           hash: user.access_hash,
@@ -92,7 +90,6 @@ const Scrape = (async () => {
     // Lets store the channels in these messages
     for (const chat of messages.chats) {
       if (chat._ === 'channel' && !chat.restricted && chat.access_hash && chat.megagroup) {
-
         await channels.insert({
           id: chat.id,
           hash: chat.access_hash,
@@ -102,34 +99,37 @@ const Scrape = (async () => {
           logged: moment().unix()
         })
 
+        await links.insert({
+          account: target.phone,
+          channel: chat.id,
+          logged: moment().unix()
+        })
+
         channelCount++
       }
     }
 
     // Time to scrape some users from scraped channels
-    const getChannels = await channels.all()
+    const getChannels = await channels.account(target.phone)
 
     // Lets filter out recently scanned channels
     const filteredChannels = getChannels.filter(channel => {
-
       const difference = moment().diff(moment(channel.scanned, 'X'), 'days')
 
-      if(difference >= process.env.CHANNEL_TIMEOUT) {
+      if (difference >= process.env.CHANNEL_TIMEOUT) {
         return channel
       }
     })
 
-    if(filteredChannels.length === 0) {
+    if (filteredChannels.length === 0) {
       console.log('[CHANNEL] no channels available for scanning right now.')
       return
-    } 
-    else {
+    } else {
       console.log('[CHANNEL] ' + filteredChannels.length + '/' + getChannels.length + ' channels available')
-    }    
+    }
 
     // Lets shuffle the array
-    for(let i = filteredChannels.length - 1; i > 0; i--){
-
+    for (let i = filteredChannels.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * i)
       const temp = filteredChannels[i]
 
@@ -138,25 +138,24 @@ const Scrape = (async () => {
     }
 
     // Let's look for users in the channels
-    for(const channel of filteredChannels) {
-
+    for (const channel of filteredChannels) {
       console.log('[CHANNEL] scanning channel ' + channel.id)
 
       // prepare second loop
       let offset = 0
-      let limit = 100
+      const limit = 100
       let total = 0
       let count = 0
       let looping = true
 
       // fetch users
-      let getParticipants = await telegram.call('channels.getParticipants', {
+      const getParticipants = await telegram.call('channels.getParticipants', {
         channel: {
           _: 'inputChannel',
           channel_id: channel.id,
           access_hash: channel.hash
         },
-          filter: {
+        filter: {
           _: 'channelParticipantsRecent'
         },
         offset: offset,
@@ -168,18 +167,17 @@ const Scrape = (async () => {
       total = getParticipants.count
 
       // loop through the participants using offsets
-      while(looping) {
-
+      while (looping) {
         console.log('[CHANNEL] scanning ' + offset + '/' + total + ' users')
 
         // fetch users
-        let getParticipants = await telegram.call('channels.getParticipants', {
+        const getParticipants = await telegram.call('channels.getParticipants', {
           channel: {
             _: 'inputChannel',
             channel_id: channel.id,
             access_hash: channel.hash
           },
-            filter: {
+          filter: {
             _: 'channelParticipantsRecent'
           },
           offset: offset,
@@ -188,7 +186,7 @@ const Scrape = (async () => {
         { dcId: target.dc })
 
         // insert users
-        for(let user of getParticipants.users) {
+        for (const user of getParticipants.users) {
           if (!user.bot && !user.deleted) {
             await users.insert({
               id: user.id,
@@ -206,7 +204,7 @@ const Scrape = (async () => {
         offset += limit
         count++
 
-        if(count++ >= (total / (limit / 2))) {
+        if (count++ >= (total / (limit / 2))) {
           looping = false
         }
       }
@@ -226,7 +224,6 @@ const Scrape = (async () => {
 
     console.log('[ACCOUNT] ' + userCount + ' users scraped')
     console.log('[ACCOUNT] ' + channelCount + ' channels scraped')
-
   } catch (err) {
     console.log(err)
   }

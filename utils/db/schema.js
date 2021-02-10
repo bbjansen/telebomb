@@ -27,7 +27,7 @@ db.schema.hasTable('users').then(function (exists) {
     console.info('[DB] Table `users` created')
 
     return db.schema.createTable('users', function (table) {
-      table.string('id').unique().nullable()
+      table.integer('id').unique().nullable()
       table.string('hash').nullable()
       table.string('phone').nullable()
       table.string('username').nullable()
@@ -48,6 +48,19 @@ db.schema.hasTable('channels').then(function (exists) {
       table.string('username').nullable()
       table.string('title').nullable()
       table.bigInteger('scanned').nullable()
+      table.bigInteger('logged').nullable()
+    })
+  };
+})
+
+// Create 'links' table if it does not exist
+db.schema.hasTable('links').then(function (exists) {
+  if (!exists) {
+    console.info('[DB] Table `links` created')
+
+    return db.schema.createTable('links', function (table) {
+      table.string('account').nullable()
+      table.integer('channel').nullable()
       table.bigInteger('logged').nullable()
     })
   };

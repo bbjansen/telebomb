@@ -7,3 +7,4 @@
 module.exports.Accounts = require('./Accounts')
 module.exports.Users = require('./Users')
 module.exports.Channels = require('./Channels')
+module.exports.Links = require('./Links')

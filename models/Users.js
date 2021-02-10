@@ -43,7 +43,7 @@ class Users {
 
   async delete (id) {
     try {
-      const deleteUser = await db('users').delete({ id: id })
+      const deleteUser = await db('users').delete().where('id', id)
 
       if (process.env.DEBUG) {
         console.log('[USER] ' + id + ' deleted')
@@ -57,7 +57,7 @@ class Users {
 
   async fetch (id) {
     try {
-      const getUser = await db('users').select({ id: id })
+      const getUser = await db('users').select().where('id', id)
 
       if (process.env.DEBUG) {
         console.log('[USER] ' + id + ' fetched')

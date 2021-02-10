@@ -43,7 +43,7 @@ class Accounts {
 
   async delete (phone) {
     try {
-      const deleteAccount = await db('accounts').delete({ phone: phone })
+      const deleteAccount = await db('accounts').delete().where('phone', phone)
 
       if (process.env.DEBUG) {
         console.log('[ACCOUNT] ' + phone + ' deleted')
@@ -57,7 +57,7 @@ class Accounts {
 
   async fetch (phone) {
     try {
-      const getAccount = await db('accounts').select({ phone: phone })
+      const getAccount = await db('accounts').select().where('phone', phone)
 
       if (process.env.DEBUG) {
         console.log('[ACCOUNT] ' + phone + ' fetched')

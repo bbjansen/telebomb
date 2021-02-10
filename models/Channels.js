@@ -29,7 +29,9 @@ class Channels {
 
   async update (channel) {
     try {
-      const updateChannel = await db('channels').update(channel).where('id', channel.id)
+      const updateChannel = await db('channels')
+        .update(channel)
+        .where('id', channel.id)
 
       if (process.env.DEBUG) {
         console.log('[CHANNEL] ' + channel.id + ' updated')
@@ -43,7 +45,7 @@ class Channels {
 
   async delete (id) {
     try {
-      const deleteChannel = await db('channels').delete({ id: id })
+      const deleteChannel = await db('channels').delete().where('id', id)
 
       if (process.env.DEBUG) {
         console.log('[CHANNEL] ' + id + ' deleted')
@@ -57,7 +59,7 @@ class Channels {
 
   async fetch (id) {
     try {
-      const getChannel = await db('channels').select({ id: id })
+      const getChannel = await db('channels').select().where('id', id)
 
       if (process.env.DEBUG) {
         console.log('[CHANNEL] ' + id + ' fetched')
@@ -69,9 +71,33 @@ class Channels {
     }
   }
 
-  async all () {
+  async account (phone) {
     try {
-      const getChannels = await db('channels').select()
+      const getChannels = await db('links')
+        .join('accounts', 'accounts.phone', 'links.account')
+        .join('channels', 'channels.id', 'links.channel')
+        .select()
+        .where('accounts.phone', phone)
+
+      if (process.env.DEBUG) {
+        console.log('[CHANNEL] ' + getChannels.length + ' channels belong to account ' + phone + ' fetched')
+      }
+
+      return getChannels
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async all (phone) {
+    try {
+      let getChannels
+
+      if (phone) {
+        getChannels = await db('channels').select().where('account_id', phone)
+      } else {
+        getChannels = await db('channels').select()
+      }
 
       if (process.env.DEBUG) {
         console.log('[CHANNEL] ' + getChannels.length + ' channels fetched')
