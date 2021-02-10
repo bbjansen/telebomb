@@ -34,6 +34,7 @@ db.schema.hasTable('users').then(function (exists) {
       table.string('phone').nullable()
       table.string('username').nullable()
       table.boolean('invited').nullable()
+      table.boolean('private').nullable()
       table.bigInteger('logged').nullable()
     })
   };
