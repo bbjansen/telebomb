@@ -6,11 +6,11 @@
 
 const moment = require('moment')
 
-function availableAccounts (accounts, interval) {
+function availableAccounts (accounts) {
   const filterAccounts = accounts.filter(account => {
     const difference = moment().diff(moment(account.scanned, 'X'), 'hours')
 
-    if (difference >= interval) return account
+    if (difference >= process.env.SCRAPE_ACCOUNT_INTERVAL) return account
   })
 
   if (filterAccounts.length === 0) {
@@ -23,11 +23,11 @@ function availableAccounts (accounts, interval) {
   return filterAccounts
 }
 
-function availableChannels (channels, interval) {
+function availableChannels (channels) {
   const filteredChannels = channels.filter(channel => {
     const difference = moment().diff(moment(channel.scanned, 'X'), 'hours')
 
-    if (difference >= interval) return channel
+    if (difference >= process.env.SCRAPE_CHANNEL_INTERVAL) return channel
   })
 
   if (filteredChannels.length === 0) {

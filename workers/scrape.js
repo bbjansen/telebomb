@@ -32,7 +32,7 @@ const Scrape = (async () => {
 
     // Lets select a random account that is available
     const getAccounts = await accounts.all()
-    const selectedAccounts = await availableAccounts(getAccounts, process.env.SCRAPE_ACCOUNT_INTERVAL)
+    const selectedAccounts = await availableAccounts(getAccounts)
     if (!selectedAccounts) return
 
     // Lets now select 1 account from the filtered ones by random
@@ -105,7 +105,7 @@ const Scrape = (async () => {
 
     // Time to scrape some users from scraped channels
     const getChannels = await channels.account(account.phone)
-    const selectedChannels = await availableAccounts(getChannels, process.env.SCRAPE_CHANNEL_INTERVAL)
+    const selectedChannels = await availableChannels(getChannels)
     if (!selectedChannels) return
 
     // Lets shuffle the array
