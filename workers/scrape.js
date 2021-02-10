@@ -75,6 +75,7 @@ const Scrape = (async () => {
     // Lets store the users in these messages
     for (const user of messages.users) {
       if (!user.bot && !user.deleted) {
+
         await users.insert({
           id: user.id,
           hash: user.access_hash,
@@ -90,7 +91,8 @@ const Scrape = (async () => {
 
     // Lets store the channels in these messages
     for (const chat of messages.chats) {
-      if (chat._ === 'channel' && !chat.restricted && chat.access_hash) {
+      if (chat._ === 'channel' && !chat.restricted && chat.access_hash && chat.megagroup) {
+
         await channels.insert({
           id: chat.id,
           hash: chat.access_hash,
@@ -168,7 +170,7 @@ const Scrape = (async () => {
       // loop through the participants using offsets
       while(looping) {
 
-        console.log('[CHANNEL] scanning...')
+        console.log('[CHANNEL] scanning ' + offset + '/' + total + ' users')
 
         // fetch users
         let getParticipants = await telegram.call('channels.getParticipants', {
@@ -204,7 +206,7 @@ const Scrape = (async () => {
         offset += limit
         count++
 
-        if(count++ >= ( total / limit)) {
+        if(count++ >= (total / (limit / 2))) {
           looping = false
         }
       }
