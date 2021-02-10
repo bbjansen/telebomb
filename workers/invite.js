@@ -4,4 +4,23 @@
 
 'use strict'
 
-const db = require('../libs').knex
+const { MTProto } = require('@mtproto/core')
+const { LocalStorage } = require('node-localstorage')
+const moment = require('moment')
+
+const Accounts = require('../models').Accounts
+const Users = require('../models').Users
+const Channels = require('../models').Channels
+
+const accounts = new Accounts()
+const users = new Users()
+const channels = new Channels()
+
+process.env.DEBUG = 1
+
+const Scrape = (async () => {
+  try {
+    } catch (err) {
+        console.log(err)
+    }
+})()

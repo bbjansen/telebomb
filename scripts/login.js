@@ -14,7 +14,6 @@ const { LocalStorage } = require('node-localstorage')
 
 const Scrape = (async () => {
   try {
-    
     // Lets open a connection via the Telegram MTProto protocol.
 
     const mtproto = new MTProto({
@@ -22,26 +21,23 @@ const Scrape = (async () => {
       api_hash: target.hash,
       customLocalStorage: LocalStorage('./sessions')
     })
-    
+
     const code = await mtproto.call('auth.sendCode', {
       phone_number: target.phone,
       settings: {
-        _: 'codeSettings',
-      },
+        _: 'codeSettings'
+      }
     },
-    { dcId: 4 });
+    { dcId: 4 })
 
     console.log(code.phone_code_hash)
-
 
     const signin = await mtproto.call('auth.signIn', {
       phone_code: 46345,
       phone_number: target.phone,
       phone_code_hash: code.phone_code_hash
     },
-    { dcId: 4, syncAuth: true });
-
-
+    { dcId: 4, syncAuth: true })
   } catch (err) {
     console.error(err)
   }
