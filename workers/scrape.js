@@ -8,6 +8,8 @@ const { MTProto } = require('@mtproto/core')
 const { LocalStorage } = require('node-localstorage')
 const moment = require('moment')
 
+const functions = require('../libs').functions
+
 const Accounts = require('../models').Accounts
 const Users = require('../models').Users
 const Channels = require('../models').Channels
@@ -29,29 +31,7 @@ const Scrape = (async () => {
     let channelCount = 0
 
     // Lets select a random account in our database
-    const getAccounts = await accounts.all()
-
-    // Lets filter out recently scanned accounts
-    const filterAccounts = getAccounts.filter(account => {
-      const difference = moment().diff(moment(account.scanned, 'X'), 'days')
-
-      if (difference >= process.env.ACCOUNT_TIMEOUT) {
-        return account
-      }
-    })
-
-    if (filterAccounts.length === 0) {
-      console.log('[ACCOUNT] no accounts available for scanning right now.')
-      return
-    } else {
-      console.log('[ACCOUNT] ' + filterAccounts.length + '/' + getAccounts.length + ' accounts available')
-    }
-
-    // Lets now select 1 account from the filtered ones by random
-    const randomize = Math.floor(Math.random() * filterAccounts.length)
-    const target = filterAccounts[randomize]
-
-    console.log('[ACCOUNT] ' + target.phone + ' selected')
+    const target = await functions.pickAccount()
 
     // Lets open a connection via the Telegram MTProto protocol.
     const telegram = new MTProto({
@@ -74,7 +54,8 @@ const Scrape = (async () => {
     // Lets store the users in these messages
     for (const user of messages.users) {
       if (!user.bot && !user.deleted) {
-        await users.insert({
+
+        const insertUser = await users.insert({
           id: user.id,
           hash: user.access_hash,
           phone: user.phone,
@@ -82,14 +63,17 @@ const Scrape = (async () => {
           invited: false,
           logged: moment().unix()
         })
-
-        userCount++
+        
+        if(insertUser) {
+          userCount++
+        }
       }
     }
 
     // Lets store the channels in these messages
     for (const chat of messages.chats) {
       if (chat._ === 'channel' && !chat.restricted && chat.access_hash && chat.megagroup) {
+
         await channels.insert({
           id: chat.id,
           hash: chat.access_hash,
@@ -99,13 +83,15 @@ const Scrape = (async () => {
           logged: moment().unix()
         })
 
-        await links.insert({
+        const insertLink = await links.insert({
           account: target.phone,
           channel: chat.id,
           logged: moment().unix()
         })
 
-        channelCount++
+        if(insertLink) {
+          channelCount++
+        }
       }
     }
 
@@ -114,7 +100,7 @@ const Scrape = (async () => {
 
     // Lets filter out recently scanned channels
     const filteredChannels = getChannels.filter(channel => {
-      const difference = moment().diff(moment(channel.scanned, 'X'), 'days')
+      const difference = moment().diff(moment(channel.scanned, 'X'), 'hours')
 
       if (difference >= process.env.CHANNEL_TIMEOUT) {
         return channel
@@ -188,7 +174,8 @@ const Scrape = (async () => {
         // insert users
         for (const user of getParticipants.users) {
           if (!user.bot && !user.deleted) {
-            await users.insert({
+            
+            const insertUser= await users.insert({
               id: user.id,
               hash: user.access_hash,
               phone: user.phone,
@@ -196,9 +183,11 @@ const Scrape = (async () => {
               invited: false,
               logged: moment().unix()
             })
-          }
 
-          userCount++
+            if(insertUser) {
+              userCount++
+            }
+          }
         }
 
         offset += limit
@@ -210,20 +199,14 @@ const Scrape = (async () => {
       }
 
       // Record scanning time for account
-      await channels.update({
-        id: channel.id,
-        scanned: moment().unix()
-      })
+      await channels.update({ id: channel.id, scanned: moment().unix() })
     }
 
     // Record scanning time for account
-    await accounts.update({
-      phone: target.phone,
-      scanned: moment().unix()
-    })
+    await accounts.update({ phone: target.phone, scanned: moment().unix() })
 
-    console.log('[ACCOUNT] ' + userCount + ' users scraped')
-    console.log('[ACCOUNT] ' + channelCount + ' channels scraped')
+    console.log('[ACCOUNT] ' + userCount + ' users scraped for account ' + target.phone)
+    console.log('[ACCOUNT] ' + channelCount + ' channels scraped for account ' + target.phone)
   } catch (err) {
     console.log(err)
   }

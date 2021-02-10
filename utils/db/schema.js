@@ -17,6 +17,8 @@ db.schema.hasTable('accounts').then(function (exists) {
       table.integer('api').nullable()
       table.string('hash').nullable()
       table.bigInteger('scanned').nullable()
+      table.bigInteger('invited').nullable()
+
     })
   };
 })

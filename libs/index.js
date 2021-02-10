@@ -5,3 +5,4 @@
 'use strict'
 
 module.exports.knex = require('./knex')
+module.exports.functions = require('./functions')
