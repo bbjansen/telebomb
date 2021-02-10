@@ -43,34 +43,6 @@ class Channels {
     }
   }
 
-  async delete (id) {
-    try {
-      const deleteChannel = await db('channels').delete().where('id', id)
-
-      if (process.env.DEBUG) {
-        console.log('[CHANNEL] ' + id + ' deleted')
-      }
-
-      return deleteChannel
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  async fetch (id) {
-    try {
-      const getChannel = await db('channels').select().where('id', id)
-
-      if (process.env.DEBUG) {
-        console.log('[CHANNEL] ' + id + ' fetched')
-      }
-
-      return getChannel
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async account (phone) {
     try {
       const getChannels = await db('links')

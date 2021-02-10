@@ -8,7 +8,7 @@ const { MTProto } = require('@mtproto/core')
 const { LocalStorage } = require('node-localstorage')
 const moment = require('moment')
 
-const functions = require('../libs').functions
+const helpers = require('../libs').helpers
 
 const Accounts = require('../models').Accounts
 const Users = require('../models').Users
@@ -27,35 +27,35 @@ process.env.INVITE_CHANNEL_INTERVAL = 0
 const Invite = (async () => {
   try {
     // Setup counts
-    let userCount = 0
-    let channelCount = 0
+    let accountCount = 0
+    const inviteCount = 0
 
     // Lets select a random account in our database
-    const availableAccounts = await functions.availableAccounts()
+    const availableAccounts = await accounts.available(process.env.INVITE_ACCOUNT_INTERVAL)
 
-    // Lets now select 1 account from the filtered ones by random
-    const randomize = Math.floor(Math.random() * availableAccounts.length)
-    const target = availableAccounts[randomize]
+    if (!availableAccounts) return
 
-    console.log('[ACCOUNT] ' + target.phone + ' selected')
+    // Lets loop through all the accounts
 
-    // Lets open a connection via the Telegram MTProto protocol.
-    const telegram = new MTProto({
-      api_id: target.api,
-      api_hash: target.hash,
-      customLocalStorage: LocalStorage('./sessions')
-    })
+    for (const account of availableAccounts) {
+      // Lets open a connection via the Telegram MTProto protocol.
+      const telegram = new MTProto({
+        api_id: account.api,
+        api_hash: account.hash,
+        customLocalStorage: LocalStorage('./sessions')
+      })
 
-    // Fetch messages from the selected account
-    const messages = await telegram.call('messages.getDialogs', {
-      offset_peer: {
-        _: 'inputPeerEmpty'
+      // Fetch messages from the selected account
+      const messages = await telegram.call('messages.getDialogs', {
+        offset_peer: {
+          _: 'inputPeerEmpty'
+        },
+        limit: 100
       },
-      limit: 100
-    },
-    { dcId: target.dc })
+      { dcId: target.dc })
 
-
+      accountCount++
+    }
   } catch (err) {
     console.log(err)
   }

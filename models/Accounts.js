@@ -5,26 +5,11 @@
 'use strict'
 
 const db = require('../libs').knex
+const moment = require('moment')
 
 class Accounts {
   constructor (opts) {
     opts = opts || {}
-  }
-
-  async insert (account) {
-    try {
-      const insertAccount = await db('accounts').insert(account)
-
-      if (process.env.DEBUG) {
-        console.log('[ACCOUNT] ' + account.phone + ' inserted')
-      }
-
-      return insertAccount
-    } catch (err) {
-      if (!err.errno === 19) {
-        console.error(err)
-      }
-    }
   }
 
   async update (account) {
@@ -36,34 +21,6 @@ class Accounts {
       }
 
       return updateAccount
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  async delete (phone) {
-    try {
-      const deleteAccount = await db('accounts').delete().where('phone', phone)
-
-      if (process.env.DEBUG) {
-        console.log('[ACCOUNT] ' + phone + ' deleted')
-      }
-
-      return deleteAccount
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  async fetch (phone) {
-    try {
-      const getAccount = await db('accounts').select().where('phone', phone)
-
-      if (process.env.DEBUG) {
-        console.log('[ACCOUNT] ' + phone + ' fetched')
-      }
-
-      return getAccount
     } catch (err) {
       console.error(err)
     }

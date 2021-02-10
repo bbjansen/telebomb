@@ -8,7 +8,7 @@ const { MTProto } = require('@mtproto/core')
 const { LocalStorage } = require('node-localstorage')
 const moment = require('moment')
 
-const functions = require('../libs').functions
+const { availableAccounts, availableChannels, shuffleArray } = require('../libs').helpers
 
 const Accounts = require('../models').Accounts
 const Users = require('../models').Users
@@ -21,7 +21,7 @@ const channels = new Channels()
 const links = new Links()
 
 process.env.DEBUG = 1
-process.env.SCRAPE_ACCOUNT_INTERVAL = 1
+process.env.SCRAPE_ACCOUNT_INTERVAL = 0
 process.env.SCRAPE_CHANNEL_INTERVAL = 0
 
 const Scrape = (async () => {
@@ -30,19 +30,21 @@ const Scrape = (async () => {
     let userCount = 0
     let channelCount = 0
 
-    // Lets select a random account in our database
-    const availableAccounts = await functions.availableAccounts()
+    // Lets select a random account that is available
+    const getAccounts = await accounts.all()
+    const selectedAccounts = await availableAccounts(getAccounts, process.env.SCRAPE_ACCOUNT_INTERVAL)
+    if (!selectedAccounts) return
 
     // Lets now select 1 account from the filtered ones by random
-    const randomize = Math.floor(Math.random() * availableAccounts.length)
-    const target = availableAccounts[randomize]
+    const randomize = Math.floor(Math.random() * selectedAccounts.length)
+    const account = selectedAccounts[randomize]
 
-    console.log('[ACCOUNT] ' + target.phone + ' selected')
+    console.log('[ACCOUNT] ' + account.phone + ' selected')
 
     // Lets open a connection via the Telegram MTProto protocol.
     const telegram = new MTProto({
-      api_id: target.api,
-      api_hash: target.hash,
+      api_id: account.api,
+      api_hash: account.hash,
       customLocalStorage: LocalStorage('./sessions')
     })
 
@@ -53,9 +55,9 @@ const Scrape = (async () => {
       },
       limit: 100
     },
-    { dcId: target.dc })
+    { dcId: account.dc })
 
-    console.log('[ACCOUNT] scanning account ' + target.phone)
+    console.log('[ACCOUNT] scanning account ' + account.phone)
 
     // Lets store the users in these messages
     for (const user of messages.users) {
@@ -90,7 +92,7 @@ const Scrape = (async () => {
         })
 
         const insertLink = await links.insert({
-          account: target.phone,
+          account: account.phone,
           channel: chat.id,
           logged: moment().unix()
         })
@@ -102,33 +104,13 @@ const Scrape = (async () => {
     }
 
     // Time to scrape some users from scraped channels
-    const getChannels = await channels.account(target.phone)
-
-    // Lets filter out recently scanned channels
-    const filteredChannels = getChannels.filter(channel => {
-      const difference = moment().diff(moment(channel.scanned, 'X'), 'hours')
-
-      if (difference >= process.env.SCRAPE_CHANNEL_INTERVAL) {
-        return channel
-      }
-    })
-
-    if (filteredChannels.length === 0) {
-      console.log('[CHANNEL] no channels available for scanning right now.')
-      return
-    } else {
-      console.log('[CHANNEL] ' + filteredChannels.length + '/' + getChannels.length + ' channels available')
-    }
+    const getChannels = await channels.account(account.phone)
+    const selectedChannels = await availableAccounts(getChannels, process.env.SCRAPE_CHANNEL_INTERVAL)
+    if (!selectedChannels) return
 
     // Lets shuffle the array
-    for (let i = filteredChannels.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i)
-      const temp = filteredChannels[i]
-
-      filteredChannels[i] = filteredChannels[j]
-      filteredChannels[j] = temp
-    }
-
+    const filteredChannels = shuffleArray(selectedChannels)
+    
     // Let's look for users in the channels
     for (const channel of filteredChannels) {
       console.log('[CHANNEL] scanning channel ' + channel.id)
@@ -153,7 +135,7 @@ const Scrape = (async () => {
         offset: offset,
         limit: limit
       },
-      { dcId: target.dc })
+      { dcId: account.dc })
 
       // set total
       total = getParticipants.count
@@ -175,7 +157,7 @@ const Scrape = (async () => {
           offset: offset,
           limit: 100
         },
-        { dcId: target.dc })
+        { dcId: account.dc })
 
         // insert users
         for (const user of getParticipants.users) {
@@ -209,10 +191,10 @@ const Scrape = (async () => {
     }
 
     // Record scanning time for account
-    await accounts.update({ phone: target.phone, scanned: moment().unix() })
+    await accounts.update({ phone: account.phone, scanned: moment().unix() })
 
-    console.log('[ACCOUNT] ' + userCount + ' users scraped for account ' + target.phone)
-    console.log('[ACCOUNT] ' + channelCount + ' channels scraped for account ' + target.phone)
+    console.log('[ACCOUNT] ' + userCount + ' users scraped for account ' + account.phone)
+    console.log('[ACCOUNT] ' + channelCount + ' channels scraped for account ' + account.phone)
   } catch (err) {
     console.log(err)
   }
