@@ -18,7 +18,7 @@ class Links {
       if (findLink.length === 0) {
         const insertLink = await db('links').insert(link)
 
-        if (process.env.DEBUG) {
+        if (process.env.LOGGING) {
           console.log('[LINK] between account ' + link.account + ' and channel ' + link.channel + ' inserted')
         }
 

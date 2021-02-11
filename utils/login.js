@@ -4,13 +4,21 @@
 
 'use strict'
 
-const db = require('../libs').knex
-
-const Seeds = require('../models').Seeds
-const seed = new Seeds()
-
 const { MTProto } = require('@mtproto/core')
 const { LocalStorage } = require('node-localstorage')
+
+/**
+ *
+ *
+ *
+ *
+ *          TO DO
+ *
+ *          LOGIN SCRIPT TO ACTIVATE NEW ACCOUNTS
+ *
+ *
+ *
+ */
 
 const Scrape = (async () => {
   try {

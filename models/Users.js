@@ -15,7 +15,7 @@ class Users {
     try {
       const insertUser = await db('users').insert(user)
 
-      if (process.env.DEBUG) {
+      if (process.env.LOGGING) {
         console.log('[USER] ' + user.id + ' inserted')
       }
 
@@ -31,7 +31,7 @@ class Users {
     try {
       const updateUser = await db('users').update(user).where('id', user.id)
 
-      if (process.env.DEBUG) {
+      if (process.env.LOGGING) {
         console.log('[USER] ' + user.id + ' updated')
       }
 
@@ -41,40 +41,26 @@ class Users {
     }
   }
 
-  async delete (id) {
-    try {
-      const deleteUser = await db('users').delete().where('id', id)
-
-      if (process.env.DEBUG) {
-        console.log('[USER] ' + id + ' deleted')
-      }
-
-      return deleteUser
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  async fetch (id) {
-    try {
-      const getUser = await db('users').select().where('id', id)
-
-      if (process.env.DEBUG) {
-        console.log('[USER] ' + id + ' fetched')
-      }
-
-      return getUser
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async all () {
     try {
       const getUsers = await db('users').select()
 
-      if (process.env.DEBUG) {
-        console.log('[USER] ' + getUsers.length + ' users fetched')
+      if (process.env.LOGGING) {
+        console.log('[USER] ' + getUsers.length + ' users selected')
+      }
+
+      return getUsers
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async available () {
+    try {
+      const getUsers = await db('users').select().where('invited', false).where('private', false)
+
+      if (process.env.LOGGING) {
+        console.log('[USER] ' + getUsers.length + ' available users selected')
       }
 
       return getUsers

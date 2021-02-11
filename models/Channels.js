@@ -15,7 +15,7 @@ class Channels {
     try {
       const insertChannel = await db('channels').insert(channel)
 
-      if (process.env.DEBUG) {
+      if (process.env.LOGGING) {
         console.log('[CHANNEL] ' + channel.id + ' inserted')
       }
 
@@ -29,15 +29,27 @@ class Channels {
 
   async update (channel) {
     try {
-      const updateChannel = await db('channels')
-        .update(channel)
-        .where('id', channel.id)
+      const updateChannel = await db('channels').update(channel).where('id', channel.id)
 
-      if (process.env.DEBUG) {
+      if (process.env.LOGGING) {
         console.log('[CHANNEL] ' + channel.id + ' updated')
       }
 
       return updateChannel
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async select (id) {
+    try {
+      const getChannel = await db('channels').select().where('id', id)
+
+      if (process.env.LOGGING) {
+        console.log('[CHANNEL] ' + id + ' selected')
+      }
+
+      return getChannel
     } catch (err) {
       console.error(err)
     }
@@ -51,8 +63,8 @@ class Channels {
         .select()
         .where('accounts.phone', phone)
 
-      if (process.env.DEBUG) {
-        console.log('[CHANNEL] ' + getChannels.length + ' channels belong to account ' + phone + ' fetched')
+      if (process.env.LOGGING) {
+        console.log('[CHANNEL] ' + getChannels.length + ' channels belong to account ' + phone + ' selected')
       }
 
       return getChannels
@@ -71,8 +83,8 @@ class Channels {
         getChannels = await db('channels').select()
       }
 
-      if (process.env.DEBUG) {
-        console.log('[CHANNEL] ' + getChannels.length + ' channels fetched')
+      if (process.env.LOGGING) {
+        console.log('[CHANNEL] ' + getChannels.length + ' channels selected')
       }
 
       return getChannels

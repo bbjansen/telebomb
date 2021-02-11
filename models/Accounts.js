@@ -5,7 +5,6 @@
 'use strict'
 
 const db = require('../libs').knex
-const moment = require('moment')
 
 class Accounts {
   constructor (opts) {
@@ -16,7 +15,7 @@ class Accounts {
     try {
       const updateAccount = await db('accounts').update(account).where('phone', account.phone)
 
-      if (process.env.DEBUG) {
+      if (process.env.LOGGING) {
         console.log('[ACCOUNT] ' + account.phone + ' updated')
       }
 
@@ -26,12 +25,30 @@ class Accounts {
     }
   }
 
+  async channel (id) {
+    try {
+      const getAccounts = await db('links')
+        .join('accounts', 'accounts.phone', 'links.account')
+        .join('channels', 'channels.id', 'links.channel')
+        .select()
+        .where('channels.id', id)
+
+      if (process.env.LOGGING) {
+        console.log('[ACCOUNT] ' + getAccounts.length + ' accounts belong to channel ' + id + ' selected')
+      }
+
+      return getAccounts
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async all () {
     try {
       const getAccounts = await db('accounts').select()
 
-      if (process.env.DEBUG) {
-        console.log('[ACCOUNT] ' + getAccounts.length + ' accounts fetched')
+      if (process.env.LOGGING) {
+        console.log('[ACCOUNT] ' + getAccounts.length + ' accounts selected')
       }
 
       return getAccounts
