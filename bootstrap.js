@@ -47,7 +47,7 @@ require('./utils/db/schema');
 // Initialize
 (async () => {
   try {
-
+    
     // Lets collect users every 12 hours
     scheduler.schedule('0 */12 * * *', () => {
       userWorker()

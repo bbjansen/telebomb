@@ -38,7 +38,7 @@ module.exports = async function () {
     const telegram = new MTProto({
       api_id: account.api,
       api_hash: account.hash,
-      customLocalStorage: LocalStorage('./sessions')
+      customLocalStorage: LocalStorage('./sessions/' + account.phone)
     })
 
     // Fetch messages from the selected account
