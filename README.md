@@ -5,8 +5,7 @@
 ## Instructions
 1. Install - `npm install`
 2. Start - `pm2 start npm -- start` (or `npm start` without pm2)
-4. Import Seeds (one time) - `./utils/db/accounts.csv` into the `accounts` table in `db.sqlite3` (hint: use `sqlite_web db.sqlite3`)
-5. Start - `pm2 start npm -- start` (or `npm start` without pm2)
+3. Import Seeds (one time) - `./utils/db/accounts.csv` into the `accounts` table in `db.sqlite3` (hint: use `sqlite_web db.sqlite3`)
 
 
 ### Sending out invites
@@ -24,11 +23,11 @@
 
 
 ### Tips
-- 
-- use PM2 for continous uptime and monitoring.
+- Use PM2 for continous uptime and monitoring.
 - `users:hours` ratio should losely follow `300:1` - eg: every 300 users add 1 hour
-- run it for a few hours before sending out invites so that it can collect users.
-- view the database in the web browser with `sqlite_web db.sqlite3`
+- Run it for a few hours before sending out invites so that it can collect users.
+- View the database in the web browser with `sqlite_web db.sqlite3`
+- Seed the DB with `./utils/db/accounts.csv` (hint: use `sqlite_web db.sqlite3`)
 
 ### .env
 
