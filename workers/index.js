@@ -5,4 +5,4 @@
 'use strict'
 
 module.exports.userWorker = require('./collectUsers')
-module.exports.invitesWorker = require('./processInvites.js')
+module.exports.inviteWorker = require('./processInvites.js')
