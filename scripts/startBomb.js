@@ -26,18 +26,18 @@ const startBomb = (async () => {
     const hours = input[5]
     const batch = shortid.generate()
 
-    if (input[0] !== '--channel' || !input[1]) {
-      console.log('[ERROR] missing --channel')
+    if (input[0] !== '-channel' || !input[1]) {
+      console.log('[ERROR] missing -channel')
       return
     }
 
-    if (input[2] !== '--users' || !input[3]) {
-      console.log('[ERROR] missing --users')
+    if (input[2] !== '-users' || !input[3]) {
+      console.log('[ERROR] missing -users')
       return
     }
 
-    if (input[4] !== '--hours' || !input[5]) {
-      console.log('[ERROR] missing --hours')
+    if (input[4] !== '-hours' || !input[5]) {
+      console.log('[ERROR] missing -hours')
       return
     }
 

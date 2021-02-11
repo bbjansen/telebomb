@@ -18,8 +18,8 @@ const resetAccounts = (async () => {
     const input = process.argv.slice(2)
     const reset = input[1]
 
-    if (input[0] !== '--reset' || reset) {
-      console.log('[ERROR] missing --reset')
+    if (input[0] !== '-reset' || reset) {
+      console.log('[ERROR] missing -reset')
       return
     }
 

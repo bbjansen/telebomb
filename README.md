@@ -9,7 +9,7 @@
 
 
 ### Sending out invites
-1. `npm run job -- --channel <ID> --users <USERS> --hours <HOURS>`
+1. `npm run job -- -channel <ID> -users <USERS> -hours <HOURS>`
 
 - `<ID>` = channel ID
 - `<USERS>` = number of invitations send (1 per user)
@@ -19,7 +19,7 @@
 
 
 ### Resetting accounts 
-1. `npm run reset -- --reset all`
+1. `npm run reset -- -reset all`
 
 
 ### Tips
